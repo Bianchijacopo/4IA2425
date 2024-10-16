@@ -287,31 +287,44 @@ internal class Program
         //6)    Raggruppare le opere in base alla nazionalità e in base al cognome dell’artista (Raggruppamento in base a più proprietà)
 
         var raggruppamento= opere
-                .Join(artisti, o => o.FkArtista, a => a.Id, (o, a) => new { o, a })
-                .Select(q => new { q.a.Nazionalita, q.a.Cognome})
-                .GroupBy(a=>new {a.Nazionalita,a.Cognome}).ToList();
-
-                foreach(var v in raggruppamento)
+                .Join(artisti, o => o.FkArtista, a => a.Id, (o,a) => new{a.Nome,o.Titolo})
+                .GroupBy(a=> a.Nome).ToList();
+                
+                foreach(var  v in raggruppamento)
                 {
-                    Console.WriteLine($"{v.Key.Cognome}-->{v.Key.Nazionalita}");
+                    Console.WriteLine(v.Key);
                     foreach(var x in v)
                     {
-                        System.Console.WriteLine($"{x}");
+                        System.Console.WriteLine(x.Titolo);
                     }
                 }
 
-
                 //punto 7
+                System.Console.WriteLine("PUNTO 7");
+                var opereFiltro=opere.Join(artisti,o=>o.FkArtista, a => a.Id,(o,a)=>new{a.Cognome,o.Titolo})
+                .GroupBy(a=>a.Cognome).ToList();
 
-                //cosi ho il raggruppamento per l'artista
-                var control=artisti.Join(opere,a=>a.Id,o=>o.FkArtista,(a,o)=>new {a,o})
-                .GroupBy(t=>t.a.Id).Select(t=>new
+                foreach(var v in opereFiltro)
                 {
-                    ArtistaId=t.Key,
-                    NumeroOpere=t.Count(),
-                }).Where(t=>t.NumeroOpere>=2).ToList();
-                
-                
+                    if(v.Count()>=2)
+                    {
+                        Console.WriteLine(v.Key);
+                    }
+                }
 
+                //8)    Trovare le opere che hanno personaggi
+
+            System.Console.WriteLine("punto 8");
+                var varPersonaggi=personaggi.Join(opere,p=>p.FkOperaId,o=>o.Id,(p,o)=>new{p.Nome,o.Titolo})
+                .GroupBy(p=>p.Nome).ToList();
+
+            foreach (var v in  varPersonaggi)
+            {
+                System.Console.WriteLine(v.Key);
+                foreach(var x in v)
+                {
+                    System.Console.WriteLine(x.Titolo);
+                }
+            }
     }
 }
