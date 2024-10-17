@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace EsercitazioneVerificaLINQ;
@@ -326,5 +327,38 @@ internal class Program
                     System.Console.WriteLine(x.Titolo);
                 }
             }
+
+            //altro metodo 
+            System.Console.WriteLine("altro metodo");
+
+            var opereConPersonaggi=opere.Join(personaggi,o=>o.Id,p=>p.FkOperaId,(o,p)=>o).Distinct().ToList(); //distinct toglie i doppioni
+            opereConPersonaggi.ForEach(System.Console.WriteLine);
+
+
+            //9 opere zenza personaggi
+
+            System.Console.WriteLine("punto 9");
+
+            var opereSenzaPersonaggi=opere.Where(o=>!opereConPersonaggi.Contains(o)).ToList();
+            opereSenzaPersonaggi.ForEach(Console.WriteLine);
+
+
+            //e niente il prof ha rifatto la mia soluzione di 5 righe in una in 0.1 secondi e mi ha arato :(
+
+            System.Console.WriteLine("punto 10");
+
+            var personaggiPerOpera=opere
+            .Join(personaggi,o=>o.Id,p=>p.FkOperaId,(o,p)=>new {Opera=o,IdPersonaggio=p.Id})
+            .GroupBy(t=>t.Opera)
+            .Select(t=>new {t.Key,NumeroPersonaggi=t.Count()})
+            .ToList();
+
+             personaggiPerOpera.ForEach(t=>System.Console.WriteLine($"id opera: {t.Key.Id} titolo : {t.Key.Titolo} numero personaggi: {t.NumeroPersonaggi}"));
+
+            int numeroMassimoPersonaggi=personaggiPerOpera.Max(t=>t.NumeroPersonaggi);
+
+            var opereConMaxPersonaggi=personaggiPerOpera.Where(t=>t.NumeroPersonaggi==numeroMassimoPersonaggi).ToList();
+            opereConMaxPersonaggi.ForEach(System.Console.WriteLine);
+
     }
 }
