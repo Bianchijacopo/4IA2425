@@ -347,18 +347,37 @@ internal class Program
 
             System.Console.WriteLine("punto 10");
 
-            var personaggiPerOpera=opere
-            .Join(personaggi,o=>o.Id,p=>p.FkOperaId,(o,p)=>new {Opera=o,IdPersonaggio=p.Id})
-            .GroupBy(t=>t.Opera)
-            .Select(t=>new {t.Key,NumeroPersonaggi=t.Count()})
+            //autori con il maggior numero di opere e il numero di opere
+
+            var autoriConOpere=opere.Join(artisti,o=>o.FkArtista,a=>a.Id,(o,a)=>new {TitoloOpere=o.Titolo,CognomeArtista=a.Cognome})
+            .GroupBy(t=>t.CognomeArtista)
+            .Select(t=>new {CognomeArtista=t.Key,NumeroOpere=t.Count()})
             .ToList();
 
-             personaggiPerOpera.ForEach(t=>System.Console.WriteLine($"id opera: {t.Key.Id} titolo : {t.Key.Titolo} numero personaggi: {t.NumeroPersonaggi}"));
+           var autoriConMaxOpere= autoriConOpere.Max(t=>t.NumeroOpere);
 
-            int numeroMassimoPersonaggi=personaggiPerOpera.Max(t=>t.NumeroPersonaggi);
+           var autoreConPiuOpere=autoriConOpere.Where(o=>o.NumeroOpere==autoriConMaxOpere).ToList();
 
-            var opereConMaxPersonaggi=personaggiPerOpera.Where(t=>t.NumeroPersonaggi==numeroMassimoPersonaggi).ToList();
-            opereConMaxPersonaggi.ForEach(System.Console.WriteLine);
+           autoreConPiuOpere.ForEach(Console.WriteLine);
 
+
+
+           //un autore quanti personaggi ha 
+
+            Console.ForegroundColor= ConsoleColor.Red;
+           System.Console.WriteLine("######################à");
+            Console.ForegroundColor= ConsoleColor.White;
+
+
+
+           var autoriPersonaggi=opere
+           .Join(artisti, o => o.FkArtista, a => a.Id, (o, a) => new {IdOpere = o.Id, CognomeArtista = a.Cognome})
+           .Join(personaggi, o => o.IdOpere, p => p.FkOperaId,(o, p) => new {o.CognomeArtista, p.Nome})
+           .GroupBy(t => t.CognomeArtista)
+           .Select(t => new {CognomeArtista = t.Key, NumeroPersonaggi = t.Count()})
+           .ToList();
+
+           autoriPersonaggi.ForEach(Console.WriteLine);
+            
     }
 }
